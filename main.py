@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 import pandas as pd
-import numpy as np 
+import numpy as np
 
 app = FastAPI()
 
@@ -8,12 +8,10 @@ app = FastAPI()
 df = pd.read_excel("aham.xlsx")
 df = df.replace({np.nan: None})
 
-colunas = ["ID RH","Genero","Cidade",]
+colunas = ["ID RH", "Genero", "Cidade"]
 
 @app.get("/pagina_coluna/{pagina}")
 def get_coluna_por_pagina(pagina: int):
-    
-
     try:
         # Calcula o índice da coluna baseado na página
         indice_coluna = pagina - 1
@@ -22,10 +20,11 @@ def get_coluna_por_pagina(pagina: int):
             return {"Erro": "Página fora do número de colunas disponíveis"}
 
         nome_coluna = colunas[indice_coluna]
-        dados = df[nome_coluna].tolist()
+        
+        # Limita a 50 primeiras linhas
+        dados = df[nome_coluna].head(50).tolist()
 
         return {nome_coluna: dados}
     
     except Exception as e:
         return {"Erro": str(e)}
- 
