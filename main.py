@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 import pandas as pd
-import numpy as np
+import numpy as np 
 
 app = FastAPI()
 
@@ -8,23 +8,33 @@ app = FastAPI()
 df = pd.read_excel("aham.xlsx")
 df = df.replace({np.nan: None})
 
-colunas = ["ID RH", "Genero", "Cidade"]
+# Lista de colunas permitidas
+colunas_permitidas = [
+    "ID RH", "Genero", "Cidade"
+]
 
-@app.get("/pagina_coluna/{pagina}")
-def get_coluna_por_pagina(pagina: int):
+# Rota de paginação
+@app.get("/tabela_paginada")
+def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50, ge=1)):
     try:
-        # Calcula o índice da coluna baseado na página
-        indice_coluna = pagina - 1
+        # Filtra apenas as colunas desejadas
+        df_filtrado = df[colunas_permitidas]
 
-        if indice_coluna >= len(colunas):
-            return {"Erro": "Página fora do número de colunas disponíveis"}
+        # Faz o cálculo de início e fim
+        inicio = (pagina - 1) * tamanho_pagina
+        fim = inicio + tamanho_pagina   
 
-        nome_coluna = colunas[indice_coluna]
+        # filtra o DataFrame
+        dados_paginados = df_filtrado.iloc[inicio:fim]
+
+        # Se não tiver mais dados
+        if dados_paginados.empty:
+            return {"Erro": "Não há mais dados para essa página."}
         
-        # Limita a 50 primeiras linhas
-        dados = df[nome_coluna].head(50).tolist()
-
-        return {nome_coluna: dados}
-    
+        return { 
+            "pagina": pagina,
+            "tamanho_pagina": tamanho_pagina,
+            "dados": dados_paginados.to_dict(orient="records")
+        }
     except Exception as e:
         return {"Erro": str(e)}
