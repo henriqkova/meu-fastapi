@@ -13,7 +13,7 @@ colunas_permitidas = [
     "ID RH", "Genero", "Cidade"
 ]
 
-permitir_colunas = False #mude para False se quiser todas colunas
+permitir_colunas = False #mude para Trie se quiser limitar as colunas
 
 # Rota de paginação
 @app.get("/tabela_paginada")
@@ -24,10 +24,10 @@ def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50
         df_filtrado = df[colunas_permitidas]
 
         if permitir_colunas:
-            df_filtrado = df
+            df_filtrado = df[colunas_permitidas]
 
         else:
-            return(df_filtrado)
+            df_filtrado =df 
 
         # Faz o cálculo de início e fim
         inicio = (pagina - 1) * tamanho_pagina
