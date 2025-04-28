@@ -13,7 +13,7 @@ colunas_permitidas = [
     "ID RH", "Genero", "Cidade"
 ]
 
-permitir_colunas = false #mude para true se quiser todas colunas
+permitir_colunas = False #mude para False se quiser todas colunas
 
 # Rota de paginação
 @app.get("/tabela_paginada")
@@ -47,3 +47,9 @@ def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50
         }
     except Exception as e:
         return {"Erro": str(e)} 
+
+
+
+
+
+
