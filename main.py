@@ -37,4 +37,4 @@ def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50
             "dados": dados_paginados.to_dict(orient="records")
         }
     except Exception as e:
-        return {"Erro": str(e)}
+        return {"Erro": str(e)} 
