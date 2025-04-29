@@ -2,28 +2,28 @@ from fastapi import FastAPI, Query
 import pandas as pd
 import numpy as np 
 
+
 app = FastAPI()
-
-# Carrega o Excel
-df = pd.read_excel("aham.xlsx")
-df = df.replace({np.nan: None})
-
 # Lista de colunas permitidas
 colunas_permitidas = [
     "ID RH", "Genero", "Cidade"
 ]
 
-permitir_colunas = False #mude para Trie se quiser limitar as colunas
+limitar_colunas = True
+#mude para True se quiser limitar as colunas
 
+def carregar_dados():
+    df = pd.read_excel("aham.xlsx")
+    df = df.replace({np.nan: None})
+    return df
 # Rota de paginação
 @app.get("/tabela_paginada")
 def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50, ge=1)):
     try:
-        
-        # Filtra apenas as colunas desejadas
-        df_filtrado = df[colunas_permitidas]
+        df = carregar_dados()
 
-        if permitir_colunas:
+        # Filtra apenas as colunas desejadas
+        if limitar_colunas:
             df_filtrado = df[colunas_permitidas]
 
         else:
@@ -37,8 +37,9 @@ def tabela_paginada(pagina: int = Query(1, ge=1), tamanho_pagina: int = Query(50
         dados_paginados = df_filtrado.iloc[inicio:fim]
 
         # Se não tiver mais dados
-        if dados_paginados.empty:
-            return {"Erro": "Não há mais dados para essa página."}
+        if dados_paginas.empty:
+            return {f"Erro: a Página {pagina} não existe na tabela!"}
+
         
         return { 
             "pagina": pagina,
